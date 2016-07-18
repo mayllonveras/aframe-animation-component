@@ -15,10 +15,12 @@ var styleParser = utils.styleParser.parse;
  */
 AFRAME.registerComponent('animation', {
   schema: {
+    beginEvent: {default: ''},
     delay: {default: 0},
     direction: {default: ''},
     duration: {default: 1000},
     easing: {default: 'easeInQuad'},
+    endEvent: {default: ''},
     elasticity: {default: 400},
     loop: {default: false},
     property: {default: ''},
@@ -29,7 +31,8 @@ AFRAME.registerComponent('animation', {
 
   init: function () {
     this.animation = null;
-    this.isPlaying = false;
+    this.beginHandler = null;
+    this.endHandler = null;
   },
 
   update: function () {
@@ -37,6 +40,7 @@ AFRAME.registerComponent('animation', {
     var data = this.data;
     var el = this.el;
     var propType = getPropertyType(el, data.property);
+    var self = this;
 
     // Base config.
     var config = {
@@ -66,7 +70,17 @@ AFRAME.registerComponent('animation', {
     this.stopAnimation();
 
     // Create animation.
-    this.animation = anime(updateConfig(el, data, config));
+    function createAnimation () { self.animation = anime(updateConfig(el, data, config)); }
+    if (data.beginEvent) {
+      this.beginHandler = el.addEventListener(data.beginEvent, createAnimation);
+    } else {
+      createAnimation();
+    }
+
+    // End event.
+    if (data.endEvent) {
+      this.endHandler = el.addEventListener(data.endEvent, this.stopAnimation.bind(this));
+    }
   },
 
   remove: function () {
