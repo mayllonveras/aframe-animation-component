@@ -15,15 +15,15 @@ var styleParser = utils.styleParser.parse;
  */
 AFRAME.registerComponent('animation', {
   schema: {
-    beginEvent: {default: ''},
     delay: {default: 0},
     direction: {default: ''},
     duration: {default: 1000},
     easing: {default: 'easeInQuad'},
-    endEvent: {default: ''},
     elasticity: {default: 400},
     loop: {default: false},
     property: {default: ''},
+    startEvents: {type: 'array'},
+    pauseEvents: {type: 'array'},
     to: {default: ''}
   },
 
@@ -31,8 +31,9 @@ AFRAME.registerComponent('animation', {
 
   init: function () {
     this.animation = null;
-    this.beginHandler = null;
-    this.endHandler = null;
+    this.config = null;
+    this.playAnimationBound = this.playAnimation.bind(this);
+    this.pauseAnimationBound = this.pauseAnimation.bind(this);
   },
 
   update: function () {
@@ -46,12 +47,12 @@ AFRAME.registerComponent('animation', {
     var config = {
       autoplay: false,
       begin: function () {
-        el.emit('animation-start');
-        el.emit(attrName + '-start');
+        el.emit('animation-begin');
+        el.emit(attrName + '-begin');
       },
       complete: function () {
-        el.emit('animation-end');
-        el.emit(attrName + '-end');
+        el.emit('animation-complete');
+        el.emit(attrName + '-complete');
       },
       direction: data.direction,
       duration: data.duration,
@@ -67,24 +68,22 @@ AFRAME.registerComponent('animation', {
     }
 
     // Stop previous animation.
-    this.stopAnimation();
+    this.pauseAnimation();
 
-    // Create animation.
-    function createAnimation () { self.animation = anime(updateConfig(el, data, config)); }
-    if (data.beginEvent) {
-      this.beginHandler = el.addEventListener(data.beginEvent, createAnimation);
-    } else {
-      createAnimation();
-    }
+    // Config.
+    this.config = updateConfig(el, data, config);
 
-    // End event.
-    if (data.endEvent) {
-      this.endHandler = el.addEventListener(data.endEvent, this.stopAnimation.bind(this));
+    // Play animation if no holding event.
+    if (!data.startEvents.length) {
+      this.playAnimation();
     }
+    this.removeEventListeners();
+    this.addEventListeners();
   },
 
   remove: function () {
-    this.stopAnimation();
+    this.pauseAnimation();
+    this.removeEventListeners();
   },
 
   tick: function (t) {
@@ -93,15 +92,45 @@ AFRAME.registerComponent('animation', {
   },
 
   pause: function () {
-    this.stopAnimation();
+    this.pauseAnimation();
+    this.removeEventListeners();
   },
 
   play: function () {
     if (!this.animation) { return; }
     this.animation.play();
+    this.addEventListeners();
   },
 
-  stopAnimation: function () {
+  addEventListeners: function () {
+    var self = this;
+    var data = this.data;
+    var el = this.el;
+    data.startEvents.map(function (eventName) {
+      el.addEventListener(eventName, self.playAnimationBound);
+    });
+    data.pauseEvents.map(function (eventName) {
+      el.addEventListener(eventName, self.pauseAnimationBound);
+    });
+  },
+
+  removeEventListeners: function () {
+    var self = this;
+    var data = this.data;
+    var el = this.el;
+    data.startEvents.map(function (eventName) {
+      el.removeEventListener(eventName, self.playAnimationBound);
+    });
+    data.pauseEvents.map(function (eventName) {
+      el.removeEventListener(eventName, self.pauseAnimationBound);
+    });
+  },
+
+  playAnimation: function () {
+    this.animation = anime(this.config);
+  },
+
+  pauseAnimation: function () {
     if (!this.animation) { return; }
     this.animation.pause();
   }
@@ -112,6 +141,8 @@ AFRAME.registerComponent('animation', {
  */
 function configDefault (el, data, config) {
   var from = getComponentProperty(el, data.property);
+  console.log(from);
+  console.log(data.to);
   return AFRAME.utils.extend({}, config, {
     targets: [{property: from}],
     property: data.to,
