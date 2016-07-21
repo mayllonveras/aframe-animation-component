@@ -31,6 +31,7 @@ AFRAME.registerComponent('animation', {
 
   init: function () {
     this.animation = null;
+    this.animationIsPlaying = false;
     this.config = null;
     this.playAnimationBound = this.playAnimation.bind(this);
     this.pauseAnimationBound = this.pauseAnimation.bind(this);
@@ -72,11 +73,11 @@ AFRAME.registerComponent('animation', {
 
     // Config.
     this.config = updateConfig(el, data, config);
+    this.animation = anime(this.config);
+
+    if (!this.data.startEvents.length) { this.animationIsPlaying = true; }
 
     // Play animation if no holding event.
-    if (!data.startEvents.length) {
-      this.playAnimation();
-    }
     this.removeEventListeners();
     this.addEventListeners();
   },
@@ -86,19 +87,14 @@ AFRAME.registerComponent('animation', {
     this.removeEventListeners();
   },
 
-  tick: function (t) {
-    if (!this.animation) { return; }
-    this.animation.tick(t);
-  },
-
   pause: function () {
     this.pauseAnimation();
     this.removeEventListeners();
   },
 
   play: function () {
-    if (!this.animation) { return; }
-    this.animation.play();
+    if (!this.animation || !this.animationIsPlaying) { return; }
+    this.playAnimation();
     this.addEventListeners();
   },
 
@@ -127,12 +123,15 @@ AFRAME.registerComponent('animation', {
   },
 
   playAnimation: function () {
-    this.animation = anime(this.config);
+    if (!this.animation) { return; }
+    this.animation.play();
+    this.animationIsPlaying = true;
   },
 
   pauseAnimation: function () {
     if (!this.animation) { return; }
     this.animation.pause();
+    this.animationIsPlaying = false;
   }
 });
 
@@ -141,13 +140,11 @@ AFRAME.registerComponent('animation', {
  */
 function configDefault (el, data, config) {
   var from = getComponentProperty(el, data.property);
-  console.log(from);
-  console.log(data.to);
   return AFRAME.utils.extend({}, config, {
-    targets: [{property: from}],
-    property: data.to,
+    targets: [{aframeProperty: from}],
+    aframeProperty: data.to,
     update: function () {
-      setComponentProperty(el, data.property, this.targets[0].property);
+      setComponentProperty(el, data.property, this.targets[0].aframeProperty);
     }
   });
 }

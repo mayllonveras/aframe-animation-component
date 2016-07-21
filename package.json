@@ -34,6 +34,7 @@
   "devDependencies": {
     "aframe": "aframevr/aframe#master",
     "aframe-bmfont-text-component": "^0.1.1",
+    "aframe-layout-component": "^1.2.0",
     "browserify": "^13.0.0",
     "browserify-css": "^0.9.1",
     "budo": "^8.2.2",
