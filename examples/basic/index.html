@@ -7,11 +7,11 @@
     <a-scene>
       <a-assets>
         <script id="orbiter" type="template/nunjucks">
-          <a-entity animation__rotate="property: rotation; duration: 2000;
+          <a-entity animation__rotate="property: rotation; dur: 2000;
                                        easing: {{ easing }}; loop: true; to: 0 360 0">
             <a-sphere radius=".08" color="#CCC"
-                      animation__color="property: material.color; direction: alternate;
-                                        duration: 400; loop: true; to: #333"
+                      animation__color="property: material.color; dir: alternate;
+                                        dur: 400; loop: true; to: #333"
                       position="{{ orbitradius }} 0 0">
             </a-sphere>
           </a-entity>
@@ -19,14 +19,14 @@
       </a-assets>
 
       <a-box id="top-plate" height="0.2" position="0 2.5 0"
-             animation__height="property: geometry.height; direction: alternate; duration: 200; loop: true; to: 0.18"></a-box>
+             animation__height="property: geometry.height; dir: alternate; dur: 200; loop: true; to: 0.18"></a-box>
 
       <a-cylinder id="piston" color="#F55" radius="0.1"
-                  animation__scale="property: scale; direction: alternate; duration: 200;
+                  animation__scale="property: scale; dir: alternate; dur: 200;
                                     easing: easeInSine; loop: true; to: 1.2 1 1.2"
-                  animation__color="property: color; direction: alternate; duration: 1000;
+                  animation__color="property: color; dir: alternate; dur: 1000;
                                     easing: easeInSine; loop: true; to: #5F5"
-                  animation__yoyo="property: position; direction: alternate; duration: 1000;
+                  animation__yoyo="property: position; dir: alternate; dur: 1000;
                                    easing: easeInSine; loop: true; to: 0 2 0">
       </a-cylinder>
 

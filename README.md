@@ -52,8 +52,8 @@ entity by name-spacing the component with double underscores (`__`):
 | Property    | Description                                                                                                                           | Default Value | Values                  |
 | --------    | -----------                                                                                                                           | ------------- | ------                  |
 | delay       | How long (milliseconds) to wait before starting.                                                                                      | 0             |                         |
-| direction   | Which direction to go from `from` to `to`.                                                                                            | normal        | alternate, reverse      |
-| duration    | How long (milliseconds) each cycle of the animation is.                                                                               | 1000          |                         |
+| dir         | Which dir to go from `from` to `to`.                                                                                            | normal        | alternate, reverse      |
+| dur         | How long (milliseconds) each cycle of the animation is.                                                                               | 1000          |                         |
 | easing      | Easing function of animation. To ease in, ease out, ease in and out.                                                                  | easeInQuad    | See [easings](#easings) |
 | elasticity  | How much to bounce (higher is stronger).                                                                                              | 400           |                         |
 | loop        | Whether to repeat animation indefinitely.                                                                                             | false         |                         |
@@ -107,11 +107,11 @@ Install and use by directly including the [browser files](dist):
 <body>
   <a-scene>
     <a-cylinder color="#F55" radius="0.1"
-                animation="property: color; direction: alternate; duration: 1000;
+                animation="property: color; dir: alternate; dur: 1000;
                            easing: easeInSine; loop: true; to: #5F5"
-                animation__scale="property: scale; direction: alternate; duration: 200;
+                animation__scale="property: scale; dir: alternate; dur: 200;
                            easing: easeInSine; loop: true; to: 1.2 1 1.2"
-                animation__yoyo="property: position; direction: alternate; duration: 1000;
+                animation__yoyo="property: position; dir: alternate; dur: 1000;
                                  easing: easeInSine; loop: true; to: 0 2 0">
     </a-cylinder>
   </a-scene>

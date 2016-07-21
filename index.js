@@ -16,8 +16,8 @@ var styleParser = utils.styleParser.parse;
 AFRAME.registerComponent('animation', {
   schema: {
     delay: {default: 0},
-    direction: {default: ''},
-    duration: {default: 1000},
+    dir: {default: ''},
+    dur: {default: 1000},
     easing: {default: 'easeInQuad'},
     elasticity: {default: 400},
     loop: {default: false},
@@ -55,8 +55,8 @@ AFRAME.registerComponent('animation', {
         el.emit('animation-complete');
         el.emit(attrName + '-complete');
       },
-      direction: data.direction,
-      duration: data.duration,
+      direction: data.dir,
+      duration: data.dur,
       easing: data.easing,
       elasticity: data.elasticity,
       loop: data.loop
@@ -92,6 +92,9 @@ AFRAME.registerComponent('animation', {
     this.removeEventListeners();
   },
 
+  /**
+   * Called after update.
+   */
   play: function () {
     if (!this.animation || !this.animationIsPlaying) { return; }
     this.playAnimation();
