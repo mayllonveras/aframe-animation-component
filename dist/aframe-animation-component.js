@@ -62,12 +62,14 @@
 	AFRAME.registerComponent('animation', {
 	  schema: {
 	    delay: {default: 0},
-	    direction: {default: ''},
-	    duration: {default: 1000},
+	    dir: {default: ''},
+	    dur: {default: 1000},
 	    easing: {default: 'easeInQuad'},
 	    elasticity: {default: 400},
+	    from: {default: ''},
 	    loop: {default: false},
 	    property: {default: ''},
+	    repeat: {default: 0},
 	    startEvents: {type: 'array'},
 	    pauseEvents: {type: 'array'},
 	    to: {default: ''}
@@ -81,6 +83,7 @@
 	    this.config = null;
 	    this.playAnimationBound = this.playAnimation.bind(this);
 	    this.pauseAnimationBound = this.pauseAnimation.bind(this);
+	    this.repeat = 0;
 	  },
 
 	  update: function () {
@@ -91,6 +94,7 @@
 	    var self = this;
 
 	    // Base config.
+	    this.repeat = data.repeat;
 	    var config = {
 	      autoplay: false,
 	      begin: function () {
@@ -100,9 +104,11 @@
 	      complete: function () {
 	        el.emit('animation-complete');
 	        el.emit(attrName + '-complete');
+	        // Repeat.
+	        if (--self.repeat > 0) { self.animation.play(); }
 	      },
-	      direction: data.direction,
-	      duration: data.duration,
+	      direction: data.dir,
+	      duration: data.dur,
 	      easing: data.easing,
 	      elasticity: data.elasticity,
 	      loop: data.loop
@@ -138,6 +144,9 @@
 	    this.removeEventListeners();
 	  },
 
+	  /**
+	   * Called after update.
+	   */
 	  play: function () {
 	    if (!this.animation || !this.animationIsPlaying) { return; }
 	    this.playAnimation();
@@ -170,7 +179,7 @@
 
 	  playAnimation: function () {
 	    if (!this.animation) { return; }
-	    this.animation.play();
+	    this.animation.restart();
 	    this.animationIsPlaying = true;
 	  },
 
@@ -185,7 +194,7 @@
 	 * Stuff property into generic `property` key.
 	 */
 	function configDefault (el, data, config) {
-	  var from = getComponentProperty(el, data.property);
+	  var from = data.from || getComponentProperty(el, data.property);
 	  return AFRAME.utils.extend({}, config, {
 	    targets: [{aframeProperty: from}],
 	    aframeProperty: data.to,
@@ -200,6 +209,7 @@
 	 */
 	function configVector (el, data, config) {
 	  var from = getComponentProperty(el, data.property);
+	  if (data.from) { from = AFRAME.utils.coordinates.parse(data.from); }
 	  var to = AFRAME.utils.coordinates.parse(data.to);
 	  return AFRAME.utils.extend({}, config, {
 	    targets: [from],
