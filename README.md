@@ -49,16 +49,19 @@ entity by name-spacing the component with double underscores (`__`):
 
 #### Properties
 
-| Property   | Description                                                                                                                           | Default Value | Values                  |
-| --------   | -----------                                                                                                                           | ------------- | ------                  |
-| delay      | How long (milliseconds) to wait before starting.                                                                                      | 0             |                         |
-| direction  | Which direction to go from `from` to `to`.                                                                                            | normal        | alternate, reverse      |
-| duration   | How long (milliseconds) each cycle of the animation is.                                                                               | 1000          |                         |
-| easing     | Easing function of animation. To ease in, ease out, ease in and out.                                                                  | easeInQuad    | See [easings](#easings) |
-| elasticity | How much to bounce (higher is stronger).                                                                                              | 400           |                         |
-| loop       | Whether to repeat animation indefinitely.                                                                                             | false         |                         |
-| property   | Property to animate. Can be a component name, a dot-delimited property of a component (e.g., `material.color`), or a plain attribute. |               |                         |
-| round      | Whether to round values.                                                                                                              | false         |                         |
+| Property    | Description                                                                                                                           | Default Value | Values                  |
+| --------    | -----------                                                                                                                           | ------------- | ------                  |
+| delay       | How long (milliseconds) to wait before starting.                                                                                      | 0             |                         |
+| direction   | Which direction to go from `from` to `to`.                                                                                            | normal        | alternate, reverse      |
+| duration    | How long (milliseconds) each cycle of the animation is.                                                                               | 1000          |                         |
+| easing      | Easing function of animation. To ease in, ease out, ease in and out.                                                                  | easeInQuad    | See [easings](#easings) |
+| elasticity  | How much to bounce (higher is stronger).                                                                                              | 400           |                         |
+| loop        | Whether to repeat animation indefinitely.                                                                                             | false         |                         |
+| pauseEvents | Comma-separated list of events to listen to to pause.                                                                                 | null          |
+| property    | Property to animate. Can be a component name, a dot-delimited property of a component (e.g., `material.color`), or a plain attribute. |               |                         |
+| round       | Whether to round values.                                                                                                              | false         |                         |
+| startEvents | Comma-separated list of events to listen to before playing. Animation will not autoplay if specified.                                 | null          |
+
 
 #### Easings
 
@@ -81,10 +84,12 @@ the `Function` column. For example: `easeInOutElastic`. The only exception is
 
 #### Events
 
-| Property       | Description        |
-| --------       | -----------        |
-| animationstart | Animation started. |
-| animationend   | Animation ended.   |
+| Property                 | Description                                                               |
+| --------                 | -----------                                                               |
+| animationbegin           | Animation began.                                                          |
+| animationcomplete        | Animation completed.                                                      |
+| animation__<ID>-begin    | Animation completed. Different event emitted depending on animation name. |
+| animation__<ID>-complete | Animation completed. Different event emitted depending on animation name. |
 
 ### Installation
 
