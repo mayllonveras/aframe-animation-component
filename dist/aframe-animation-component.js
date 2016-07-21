@@ -68,6 +68,8 @@
 	    elasticity: {default: 400},
 	    loop: {default: false},
 	    property: {default: ''},
+	    startEvents: {type: 'array'},
+	    pauseEvents: {type: 'array'},
 	    to: {default: ''}
 	  },
 
@@ -75,7 +77,10 @@
 
 	  init: function () {
 	    this.animation = null;
-	    this.isPlaying = false;
+	    this.animationIsPlaying = false;
+	    this.config = null;
+	    this.playAnimationBound = this.playAnimation.bind(this);
+	    this.pauseAnimationBound = this.pauseAnimation.bind(this);
 	  },
 
 	  update: function () {
@@ -83,17 +88,18 @@
 	    var data = this.data;
 	    var el = this.el;
 	    var propType = getPropertyType(el, data.property);
+	    var self = this;
 
 	    // Base config.
 	    var config = {
 	      autoplay: false,
 	      begin: function () {
-	        el.emit('animation-start');
-	        el.emit(attrName + '-start');
+	        el.emit('animation-begin');
+	        el.emit(attrName + '-begin');
 	      },
 	      complete: function () {
-	        el.emit('animation-end');
-	        el.emit(attrName + '-end');
+	        el.emit('animation-complete');
+	        el.emit(attrName + '-complete');
 	      },
 	      direction: data.direction,
 	      duration: data.duration,
@@ -109,33 +115,69 @@
 	    }
 
 	    // Stop previous animation.
-	    this.stopAnimation();
+	    this.pauseAnimation();
 
-	    // Create animation.
-	    this.animation = anime(updateConfig(el, data, config));
+	    // Config.
+	    this.config = updateConfig(el, data, config);
+	    this.animation = anime(this.config);
+
+	    if (!this.data.startEvents.length) { this.animationIsPlaying = true; }
+
+	    // Play animation if no holding event.
+	    this.removeEventListeners();
+	    this.addEventListeners();
 	  },
 
 	  remove: function () {
-	    this.stopAnimation();
-	  },
-
-	  tick: function (t) {
-	    if (!this.animation) { return; }
-	    this.animation.tick(t);
+	    this.pauseAnimation();
+	    this.removeEventListeners();
 	  },
 
 	  pause: function () {
-	    this.stopAnimation();
+	    this.pauseAnimation();
+	    this.removeEventListeners();
 	  },
 
 	  play: function () {
-	    if (!this.animation) { return; }
-	    this.animation.play();
+	    if (!this.animation || !this.animationIsPlaying) { return; }
+	    this.playAnimation();
+	    this.addEventListeners();
 	  },
 
-	  stopAnimation: function () {
+	  addEventListeners: function () {
+	    var self = this;
+	    var data = this.data;
+	    var el = this.el;
+	    data.startEvents.map(function (eventName) {
+	      el.addEventListener(eventName, self.playAnimationBound);
+	    });
+	    data.pauseEvents.map(function (eventName) {
+	      el.addEventListener(eventName, self.pauseAnimationBound);
+	    });
+	  },
+
+	  removeEventListeners: function () {
+	    var self = this;
+	    var data = this.data;
+	    var el = this.el;
+	    data.startEvents.map(function (eventName) {
+	      el.removeEventListener(eventName, self.playAnimationBound);
+	    });
+	    data.pauseEvents.map(function (eventName) {
+	      el.removeEventListener(eventName, self.pauseAnimationBound);
+	    });
+	  },
+
+	  playAnimation: function () {
+	    if (!this.animation) { return; }
+	    this.animation.play();
+	    this.animationIsPlaying = true;
+	  },
+
+	  pauseAnimation: function () {
 	    if (!this.animation) { return; }
 	    this.animation.pause();
+	    this.animationIsPlaying = false;
 	  }
 	});
 
@@ -145,10 +187,10 @@
 	function configDefault (el, data, config) {
 	  var from = getComponentProperty(el, data.property);
 	  return AFRAME.utils.extend({}, config, {
-	    targets: [{property: from}],
-	    property: data.to,
+	    targets: [{aframeProperty: from}],
+	    aframeProperty: data.to,
 	    update: function () {
-	      setComponentProperty(el, data.property, this.targets[0].property);
+	      setComponentProperty(el, data.property, this.targets[0].aframeProperty);
 	    }
 	  });
 	}
