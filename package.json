@@ -1,6 +1,6 @@
 {
   "name": "aframe-animation-component",
-  "version": "0.3.2",
+  "version": "3.0.0",
   "description": "Animation component for A-Frame.",
   "main": "index.js",
   "scripts": {
