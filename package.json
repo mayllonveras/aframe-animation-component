@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/ngokevin/aframe-animation-component#readme",
   "devDependencies": {
-    "aframe": "aframevr/aframe#master",
+    "aframe": "^0.3.0",
     "aframe-bmfont-text-component": "^0.1.1",
     "aframe-layout-component": "^1.2.0",
     "browserify": "^13.0.0",
